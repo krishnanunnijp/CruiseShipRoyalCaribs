@@ -12,7 +12,7 @@ public class TcpServer implements CommandLineRunner {
     public void run(String... args) throws Exception {
         ServerSocket serverSocket = new ServerSocket(9000);
         System.out.println("Shore proxy listening...");
-        Socket shipSocket = serverSocket.accept(); // Single persistent connection
+        Socket shipSocket = serverSocket.accept(); 
         new Thread(new TcpRequestHandler(shipSocket)).start();
     }
 }

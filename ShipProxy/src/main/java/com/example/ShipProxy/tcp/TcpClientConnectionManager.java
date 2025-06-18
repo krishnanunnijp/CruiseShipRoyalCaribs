@@ -5,6 +5,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.example.sharedlib.proxy.model.ProxyRequest;
@@ -18,6 +19,13 @@ public class TcpClientConnectionManager {
     private Socket socket;
     private ObjectOutputStream out;
     private ObjectInputStream in;
+    
+    @Value("${shore.proxy.host}")
+    private String shoreHost;
+
+    @Value("${shore.proxy.port}")
+    private int shorePort;
+
 
     private final Object lock = new Object();
 
@@ -26,11 +34,11 @@ public class TcpClientConnectionManager {
             synchronized (lock) {
                 if (socket == null || socket.isClosed()) {
                     try {
-                    	Socket socket = new Socket("shoreproxy", 9002);
+                    	Socket socket = new Socket(this.shoreHost, this.shorePort);
                         out = new ObjectOutputStream(socket.getOutputStream());
                         in = new ObjectInputStream(socket.getInputStream());
                     } catch (IOException e) {
-                    	throw new IOException("Unable to connect to shore proxy server at localhost:9002", e);
+                    	throw new IOException("Unable to connect to shore proxy server at "+this.shoreHost+":"+this.shorePort, e);
                     }
                 }
             }
