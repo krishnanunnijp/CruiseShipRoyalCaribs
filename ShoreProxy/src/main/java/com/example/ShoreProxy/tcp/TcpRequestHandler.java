@@ -3,11 +3,8 @@ package com.example.ShoreProxy.tcp;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
@@ -46,24 +43,19 @@ public class TcpRequestHandler implements Runnable {
 
     private ProxyResponse handleRequest(ProxyRequest request) {
         try {
-            // Build headers
-            HttpHeaders headers = new HttpHeaders();
-            if (request.getHeaders() != null) {
-                request.getHeaders().forEach(headers::add);
-            }
 
-            // Create entity
-            HttpEntity<String> entity = new HttpEntity<>(request.getBody(), headers);
+            
+            HttpEntity<String> entity = new HttpEntity<>(request.getBody(), request.getHeaders());
 
-            // Make HTTP request to the target URL
+            
             ResponseEntity<String> responseEntity = restTemplate.exchange(
-                    request.getUrl(),                                 // Target URL
-                    HttpMethod.valueOf(request.getMethod()),          // GET, POST, etc.
+                    request.getUrl(),                                 
+                    HttpMethod.valueOf(request.getMethod()),          
                     entity,
                     String.class
             );
 
-            // Build and return the ProxyResponse
+            
             ProxyResponse response = new ProxyResponse();
             response.setStatus(responseEntity.getStatusCodeValue());
             response.setBody(responseEntity.getBody());

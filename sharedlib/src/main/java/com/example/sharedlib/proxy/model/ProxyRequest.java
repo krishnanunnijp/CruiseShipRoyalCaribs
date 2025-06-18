@@ -3,6 +3,8 @@ package com.example.sharedlib.proxy.model;
 import java.io.Serializable;
 import java.util.Map;
 
+import org.springframework.http.HttpHeaders;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,7 +17,7 @@ public class ProxyRequest implements Serializable {
 	private static final long serialVersionUID = 2048906288081011821L;
     private String method;
     private String url;
-    private Map<String, String> headers;
+    private HttpHeaders headers = new HttpHeaders(); 
     private String body;
     
 	public String getMethod() {
@@ -30,12 +32,13 @@ public class ProxyRequest implements Serializable {
 	public void setUrl(String url) {
 		this.url = url;
 	}
-	public Map<String, String> getHeaders() {
-		return headers;
-	}
-	public void setHeaders(Map<String, String> headers) {
-		this.headers = headers;
-	}
+    public HttpHeaders getHeaders() {
+        return headers;
+    }
+
+    public void setHeaders(HttpHeaders headers) {
+        this.headers = headers != null ? headers : new HttpHeaders();
+    }
 	public String getBody() {
 		return body;
 	}

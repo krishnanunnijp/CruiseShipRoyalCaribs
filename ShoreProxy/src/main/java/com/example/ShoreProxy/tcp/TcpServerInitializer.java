@@ -18,7 +18,7 @@ public class TcpServerInitializer {
 
                 while (true) {
                     Socket clientSocket = serverSocket.accept();
-                    new Thread(new TcpRequestHandler(clientSocket)).start(); // Your existing handler
+                    new Thread(new TcpRequestHandler(clientSocket)).start(); 
                 }
             } catch (IOException e) {
                 System.err.println("Failed to start TCP server: " + e.getMessage());
