@@ -14,9 +14,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.ShipProxy.model.ProxyRequest;
-import com.example.ShipProxy.model.ProxyResponse;
+
 import com.example.ShipProxy.tcp.TcpClientConnectionManager;
+import com.example.sharedlib.proxy.model.ProxyRequest;
+import com.example.sharedlib.proxy.model.ProxyResponse;
 
 import jakarta.servlet.http.HttpServletRequest;
 

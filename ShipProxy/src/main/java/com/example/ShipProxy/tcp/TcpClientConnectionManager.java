@@ -7,8 +7,9 @@ import java.net.Socket;
 
 import org.springframework.stereotype.Component;
 
-import com.example.ShipProxy.model.ProxyRequest;
-import com.example.ShipProxy.model.ProxyResponse;
+import com.example.sharedlib.proxy.model.ProxyRequest;
+import com.example.sharedlib.proxy.model.ProxyResponse;
+
 
 
 @Component
@@ -25,11 +26,11 @@ public class TcpClientConnectionManager {
             synchronized (lock) {
                 if (socket == null || socket.isClosed()) {
                     try {
-                        socket = new Socket("localhost", 9001);
+                    	Socket socket = new Socket("shoreproxy", 9002);
                         out = new ObjectOutputStream(socket.getOutputStream());
                         in = new ObjectInputStream(socket.getInputStream());
                     } catch (IOException e) {
-                        throw new IOException("Unable to connect to shore proxy server at localhost:9000", e);
+                    	throw new IOException("Unable to connect to shore proxy server at localhost:9002", e);
                     }
                 }
             }

@@ -27,6 +27,7 @@
 		<url/>
 	</scm>
 	<properties>
+<sharedlib-systemPath>libs/sharedlib-0.0.1-SNAPSHOT.jar</sharedlib-systemPath>
 		<java.version>17</java.version>
 	</properties>
   	<dependencies>
@@ -59,6 +60,12 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+<dependency>
+  <groupId>com.example</groupId>
+  <artifactId>sharedlib</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+</dependency>
+
   	</dependencies>
 
 	<build>

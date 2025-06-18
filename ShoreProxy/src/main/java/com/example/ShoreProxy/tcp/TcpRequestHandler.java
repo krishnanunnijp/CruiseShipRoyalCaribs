@@ -10,11 +10,12 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import com.example.ShoreProxy.model.ProxyRequest;
-import com.example.ShoreProxy.model.ProxyResponse;
+import com.example.sharedlib.proxy.model.ProxyRequest;
+import com.example.sharedlib.proxy.model.ProxyResponse;
+
+
 
 
 public class TcpRequestHandler implements Runnable {
@@ -64,23 +65,17 @@ public class TcpRequestHandler implements Runnable {
 
             // Build and return the ProxyResponse
             ProxyResponse response = new ProxyResponse();
-            response.setStatusCode(responseEntity.getStatusCodeValue());
+            response.setStatus(responseEntity.getStatusCodeValue());
             response.setBody(responseEntity.getBody());
 
-            // Convert Spring headers to simple Map<String, String>
-            Map<String, String> responseHeaders = new HashMap<>();
-            responseEntity.getHeaders().forEach((key, values) -> {
-                if (!values.isEmpty()) {
-                    responseHeaders.put(key, values.get(0)); // you can join if multiple
-                }
-            });
-            response.setHeaders(responseHeaders);
+            response.setHeaders(responseEntity.getHeaders());
+
 
             return response;
         } catch (Exception e) {
             // Handle HTTP errors or connection errors
             ProxyResponse errorResponse = new ProxyResponse();
-            errorResponse.setStatusCode(500);
+            errorResponse.setStatus(500);
             errorResponse.setBody("Error while forwarding request: " + e.getMessage());
             return errorResponse;
         }
