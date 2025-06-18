@@ -40,6 +40,7 @@ cd ../
 # Build ShipProxy
 docker build -t shipproxy -f ShipProxy/Dockerfile .
 
+```
 ###  Step 2: Run Docker Images
 
 ```bash
@@ -52,16 +53,16 @@ docker run -d --name shoreproxy --network cruise-net -p 9002:9002 shoreproxy
 # Run ShipProxy
 docker run -d --name shipproxy --network cruise-net -p 8080:8080 shipproxy
 
-
+```
 ###  Step 3: Run Test Case
-
+```bash
 curl -x http://localhost:8080 http://httpforever.com/
 
-
+```
 ###  Step 4: Stop Docker Container
-
+```bash
 docker stop shipproxy shoreproxy && docker rm shipproxy shoreproxy
-
+```
 
 
 
