@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -11,50 +14,71 @@ import org.springframework.stereotype.Component;
 import com.example.sharedlib.proxy.model.ProxyRequest;
 import com.example.sharedlib.proxy.model.ProxyResponse;
 
+import jakarta.annotation.PostConstruct;
+
 
 
 @Component
 public class TcpClientConnectionManager {
 
-    private Socket socket;
-    private ObjectOutputStream out;
-    private ObjectInputStream in;
-    
     @Value("${shore.proxy.host}")
     private String shoreHost;
 
     @Value("${shore.proxy.port}")
     private int shorePort;
 
+    private Socket socket;
+    private ObjectOutputStream out;
+    private ObjectInputStream in;
 
-    private final Object lock = new Object();
+    private final BlockingQueue<ProxyJob> queue = new LinkedBlockingQueue<>();
 
-    private void connectIfNecessary() throws IOException {
-        if (socket == null || socket.isClosed()) {
-            synchronized (lock) {
-                if (socket == null || socket.isClosed()) {
-                    try {
-                    	Socket socket = new Socket(this.shoreHost, this.shorePort);
-                        out = new ObjectOutputStream(socket.getOutputStream());
-                        in = new ObjectInputStream(socket.getInputStream());
-                    } catch (IOException e) {
-                    	throw new IOException("Unable to connect to shore proxy server at "+this.shoreHost+":"+this.shorePort, e);
+    @PostConstruct
+    public void init() {
+        try {
+            this.socket = new Socket(this.shoreHost, this.shorePort);
+            this.out = new ObjectOutputStream(socket.getOutputStream());
+            this.in = new ObjectInputStream(socket.getInputStream());
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to connect to shore proxy server at " + shoreHost + ":" + shorePort, e);
+        }
+
+        Thread worker = new Thread(() -> {
+            while (true) {
+                ProxyJob job = null;
+                try {
+                    job = queue.take();
+
+                    out.writeObject(job.request());
+                    out.flush();
+
+                    ProxyResponse response = (ProxyResponse) in.readObject();
+                    job.future().complete(response);
+
+                } catch (Exception e) {
+                    if (job != null) {
+                        job.future().completeExceptionally(e);
                     }
                 }
             }
-        }
+        });
+        worker.setDaemon(true);
+        worker.start();
     }
 
+    public CompletableFuture<ProxyResponse> sendRequest(ProxyRequest request) {
+        ProxyJob job = new ProxyJob(request);
+        queue.offer(job);
+        return job.future();
+    }
 
-    
-    public ProxyResponse sendRequest(ProxyRequest request) throws IOException, ClassNotFoundException {
-        connectIfNecessary();
-        synchronized (lock) {
-            out.writeObject(request);
-            out.flush();
-            return (ProxyResponse) in.readObject();
+    private record ProxyJob(ProxyRequest request, CompletableFuture<ProxyResponse> future) {
+        ProxyJob(ProxyRequest request) {
+            this(request, new CompletableFuture<>());
         }
     }
 }
+
+
 
 

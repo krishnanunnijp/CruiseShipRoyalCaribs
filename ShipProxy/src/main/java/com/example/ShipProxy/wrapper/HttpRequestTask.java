@@ -30,7 +30,7 @@ public class HttpRequestTask {
 
         try {
             ProxyRequest proxyRequest = buildFromHttpServletRequest(request);
-            ProxyResponse proxyResp = tcpManager.sendRequest(proxyRequest);
+            ProxyResponse proxyResp = tcpManager.sendRequest(proxyRequest).get();
 
             // Set status and headers
             response.setStatus(proxyResp.getStatus());

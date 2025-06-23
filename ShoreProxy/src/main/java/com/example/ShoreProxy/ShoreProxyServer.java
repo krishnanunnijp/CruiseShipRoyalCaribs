@@ -12,7 +12,8 @@ public class ShoreProxyServer {
         System.out.println("ShoreProxy listening on port 9002...");
 
         while (true) {
-            Socket clientSocket = serverSocket.accept();
+        	Socket clientSocket = serverSocket.accept();
+        	System.out.println("🔌 New TCP connection accepted from: " + clientSocket.getRemoteSocketAddress());
             new Thread(new TcpRequestHandler(clientSocket)).start();
         }
     }
