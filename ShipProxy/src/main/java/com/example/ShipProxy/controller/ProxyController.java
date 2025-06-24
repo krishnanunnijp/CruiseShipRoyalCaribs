@@ -19,7 +19,7 @@ public class ProxyController {
     @Autowired
     private TcpClientConnectionManager tcpClient;
 
-    @RequestMapping(value = "/**", method = {RequestMethod.GET, RequestMethod.POST})
+    @RequestMapping(value = "/**")
     public void proxy(HttpServletRequest request, HttpServletResponse response) throws IOException {
         var asyncContext = request.startAsync(); 
         HttpRequestTask task = new HttpRequestTask(asyncContext, tcpClient);
